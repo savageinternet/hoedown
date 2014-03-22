@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block title %}K4 Hoedown -- {{task}}{% endblock %}
+{% block css %}
+  <link rel="stylesheet" type="text/css" href="https://k4hoedown.s3.amazonaws.com/task.css" />
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h1 class="text-center">Swap Partners!</h1>
+      <p class="lead">
+        You two have already completed a task together.  Find more players
+        to finish the game!
+      </p>
+      <a href="/users/{{viewer.code}}" class="btn btn-lg btn-success">My Page</a>
+    </div>
+</div>
+{% endblock %}

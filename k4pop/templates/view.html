@@ -1,0 +1,133 @@
+{% extends "layout.html" %}
+{% block title %}K4 Hoedown -- {{user.name}}{% endblock %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="https://k4hoedown.s3.amazonaws.com/stats.css" />
+    <link rel="stylesheet" type="text/css" href="https://k4hoedown.s3.amazonaws.com/viewUser.css" />
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 text-center">
+      <h1>{{user_role}} {{user.name}}</h1>
+    </div>
+  </div>
+  {% if is_admin %}
+  <div class="row">
+    <div class="col-md-12">
+      <div class="btn-group">
+        <a href="/admin" class="btn btn-lg btn-primary">Dashboard</a>
+        <a href="/admin/users" class="btn btn-lg btn-info">Users</a>
+        <a href="/users/{{user.code}}" class="btn btn-lg btn-default">View as Player</a>
+    </div>
+  </div>
+  {% endif %}
+  {% if completed_all_tasks %}
+    <div class="col-md-12 col-xs-12">
+      <div class="panel panel-success">
+        <div class="panel-heading">
+          <div class="instructions-title panel-title">Congratulations!</div>
+        </div>
+        <div class="panel-body">
+            <p class="lead">
+            You've completed all seven tasks!  Return to Kinoma (stand 135) to claim your
+            prize!
+            </p>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+  <div class="row">
+    <div class="col-md-4 col-xs-12">
+      <h2>You Have Met</h2>
+      <div id="roles_met">
+      {% for role_met in roles_met %}
+        <div class="role-met">
+          {% if not role_met.completed_with and not role_met.started_with %}
+            <span class="text-danger glyphicon glyphicon-remove-sign"></span>
+            <span class="text-danger">{{role_met.role_name}}</span>
+          {% elif not role_met.completed_with and role_met.started_with %}
+            <span class="text-warning glyphicon glyphicon-warning-sign"></span>
+            <span class="text-warning">{{role_met.role_name}}</span>
+            <small class="text-warning">({{role_met.task_name}})</small>
+          {% else %}
+            <span class="text-success glyphicon glyphicon-ok-sign"></span>
+            <span class="text-success">{{role_met.role_name}}</span>
+            <small class="text-success">({{role_met.task_name}})</small>
+          {% endif %}
+        </div>
+      {% endfor %}
+      </div>
+      <div id="roles_met_legend">
+        <h3>Legend</h3>
+        <div>
+          <span class="text-danger glyphicon glyphicon-remove-sign"></span>
+          <span class="text-danger">Haven't Met Yet</span>
+        </div>
+        <div>
+          <span class="text-warning glyphicon glyphicon-warning-sign"></span>
+          <span class="text-warning">Task Incomplete</span>
+        </div>
+        <div>
+          <span class="text-success glyphicon glyphicon-ok-sign"></span>
+          <span class="text-success">Done!</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 col-xs-6">
+      <h2>Your Stats</h2>
+      <div id="ability_scores">
+        <div class="value-label">Intelligence:
+          <div class="numbers number{{user.int}}"> </div>
+        </div>
+        <div class="values value{{user.int}}"></div>
+
+        <div class="value-label">Wisdom:
+          <div class="numbers number{{user.wis}}"> </div>
+        </div>
+        <div class="values value{{user.wis}}"></div>
+
+        <div class="value-label">Strength:
+          <div class="numbers number{{user.str}}"> </div>
+        </div>
+        <div class="values value{{user.str}}"></div>
+
+        <div class="value-label">Constitution:
+          <div class="numbers number{{user.con}}"> </div>
+        </div>
+        <div class="values value{{user.con}}"></div>
+
+        <div class="value-label">Dexterity:
+          <div class="numbers number{{user.dex}}"> </div>
+        </div>
+        <div class="values value{{user.dex}}"></div>
+
+        <div class="value-label">Charisma:
+          <div class="numbers number{{user.cha}}"> </div>
+        </div>
+        <div class="values value{{user.cha}}"></div>
+      </div>
+    </div>
+    <div class="col-md-4 col-xs-6">
+      <h2>Your Code</h2>
+      <div class="qr-code">
+        <img src="{{qrcode_url}}" />
+      </div>
+    </div>
+    <div class="col-md-12 col-xs-12">
+      <div class="panel panel-success">
+        <div class="panel-heading">
+          <div class="instructions-title panel-title">Instructions</div>
+        </div>
+        <div class="panel-body">
+          <ol class="instructions-list">
+            <li>Find someone from each character type (Rancher, Rodeo Clown, Outlaw, Sheriff, Oil Baron, Conquistador, Square Dancer)</li>
+            <li>Scan their code or have them scan yours</li>
+            <li>Complete the challenge</li>
+            <li>With all challenges completed, return to Kinoma (stand 135) for a prize!</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

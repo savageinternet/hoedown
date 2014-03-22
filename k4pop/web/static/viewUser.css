@@ -1,0 +1,16 @@
+.role-met {
+  font-size: 150%;
+}
+
+#roles_met_legend {
+  font-size: 125%;
+}
+
+.instructions-title {
+  font-size: 200%;
+}
+
+.instructions-list > li {
+  margin-bottom: 6px;
+  font-size: 150%;
+}

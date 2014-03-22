@@ -1,0 +1,38 @@
+{% extends "task.html" %}
+{% block css %}
+  {{block.super}}
+  <link rel="stylesheet" type="text/css" href="https://k4hoedown.s3.amazonaws.com/hangman.css" />
+{% endblock %}
+{% block task %}
+Hangman
+{% endblock %}
+{% block taskstory %}
+Quick!  You'd better tell the sheriffs what they want to hear, or they'll tie
+the noose real tight and let you hang.  Guess letters by tapping them below,
+but don't get carried away - you can only press your luck so far...
+{% endblock %}
+{% block taskbody %}
+  <div class="text-center">
+    <canvas id="canvas_hangman" width="300" height="300" />
+  </div>
+  <div id="state_hangman">
+    <div id="reveal_phrase"></div>
+    <div id="letters_wrapper">
+      {% for letter in letters %}
+        <div class="letter">
+          <strong>{{letter}}</strong>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  <a id="link_failure" onclick="location.reload(true)" class="btn btn-lg btn-danger hide">Try again!</a>
+  <form id="form_success" action="/users/{{viewee.code}}/complete" method="POST" class="hide">
+    {% csrf_token %}
+    <input type="hidden" id="expected" name="expected" value="{{phrase}}" />
+    <input type="hidden" id="letters" name="letters" value="{{letters}}" />
+    <input type="submit" class="btn btn-lg btn-success" value="Good job!" />
+  </form>
+{% endblock %}
+{% block jsFoot %}
+  <script src="https://k4hoedown.s3.amazonaws.com/hangman.js"></script>
+{% endblock %}

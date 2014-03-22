@@ -1,0 +1,48 @@
+.letter {
+  background-color: #6FAA45;
+  color: #fff;
+  padding: 5px;
+  display: inline-block;
+  border: 1px solid #d6e9c6;
+  width: 50px;
+  text-align: center;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.letter.letter-used {
+  background-color: #ccc;
+  border: 1px solid #999;
+  cursor: default;
+}
+
+.letter.letter-used.letter-fail {
+  background-color: #f93;
+  border: 1px solid #c60;
+}
+
+.reveal-letter {
+  border: 1px solid #e7e7e7;
+  border-bottom: 2px solid #000;
+  background-color: #eee;
+  vertical-align: bottom;
+  height: 30px;
+  width: 40px;
+  display: inline-block;
+  margin: 3px;
+  padding: 3px;
+  text-align: center;
+}
+
+.reveal-punctuation {
+  text-align: center;
+  vertical-align: bottom;
+  height: 30px;
+  width: 20px;
+  display: inline-block;
+  margin: 3px;
+  padding: 3px;
+}
+
+
+

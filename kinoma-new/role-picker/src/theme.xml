@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module xmlns="http://www.kinoma.com/kpr/1">
+    <style id="titleStyle" font="bold 22px" color="#fff" align="center" />
+    <style id="subTitleStyle" font="bold 20px" color="#fff" align="center" />
+    <style id="textStyle" font="18px" color="#fff" align="center" />
+    <style id="testButtonStyle" font="bold 18px" color="#444" />
+    <style id="abilityButtonStyle" font="bold 12px" color="#222" />
+    <skin id="bgSkin" color="#929292" />
+</module>

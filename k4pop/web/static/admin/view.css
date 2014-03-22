@@ -1,0 +1,9 @@
+#user_heading {
+  display: inline-block;
+}
+
+#form_user_name {
+  display: inline-block;
+  position: relative;
+  top: -10px;
+}

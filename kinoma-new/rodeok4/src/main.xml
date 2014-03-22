@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<program xmlns="http://www.kinoma.com/kpr/1">
+
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<!-- ASSETS -->
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    
+	<skin id="whiteSkin" color="white"/>
+	<skin id="blackSkin" color="black"/>
+	
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<!-- STYLES -->
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+	<style id="applicationStyle" font="18px HelveticaNeue,Roboto" color="black" align="left,middle"/>
+	<script>
+		application.style = applicationStyle;
+	</script>
+	<style id="waitingStyle" font="64px" color="#aaa" align="center,top">
+		<margins top="20" bottom="-50"/>
+	</style>
+	<style id="messageStyle" font="36px" color="#aaa" align="center,middle"/>
+	
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<!-- BEHAVIORS -->
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    
+    <behavior id="ApplicationBehavior">
+        <method id="onLaunch" params="application"><![CDATA[
+            application.discover( "rodeoremote" );
+		]]></method>
+        <method id="onQuit" params="application"><![CDATA[
+			application.forget( "rodeoremote" );
+		]]></method>
+        <method id="onDiscovered" params="discoveries"><![CDATA[
+            var controller = model.controller;
+			for ( var uuid in controller ) {
+				var missing = true;
+				for ( var j = 0; j < discoveries.length; j++ ) {
+					if ( discoveries[ j ].uuid == uuid ) {
+				       missing = false;
+				       break;
+				   }
+				}
+				if ( missing ) {
+					application.distribute( "onK4Lost", controller[uuid] );
+					delete controller[uuid];
+				}
+			}
+			for ( var j = 0; j < discoveries.length; j++ ) {
+				if ( ( discoveries[ j ].uuid in controller ) == false ) {
+					trace( "### discovered new remote device: " + discoveries[ j ].location + "\n" );
+					controller[ discoveries[ j ].uuid ] = discoveries[ j ];
+					application.distribute( "onK4Discovered", discoveries[ j ] );
+					break;	// only allow one controller
+				}
+			}
+		]]></method>
+        <method id="sendMessage" params="message"><![CDATA[
+			for ( var uuid in model.controller ) {
+				var remote = model.controller[ uuid ];
+				application.invoke( new Message( remote.location + message ) );
+				break;	// only one k4
+			}
+		]]></method>
+    </behavior>
+
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<!-- LAYOUTS -->
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+	<picture id="Wait" width="200" height="200" url="'./assets/waiting-dark.png'">
+		<behavior>
+			<method id="onCreate" params="picture, data"><![CDATA[
+				picture.origin = { x:100, y:100 };
+				picture.scale = { x:0.5, y:0.5 };
+			]]></method>	
+			<method id="onDisplaying" params="picture"><![CDATA[
+				picture.start();
+			]]></method>	
+			<method id="onTimeChanged" params="picture"><![CDATA[
+				var rotation = picture.rotation;
+				rotation -= 5;
+				if (rotation < 0) rotation = 360;
+				picture.rotation = rotation;
+			]]></method>	
+		</behavior>
+	</picture>
+
+	<container id="WaitingContainer" left="0" right="0" top="0" bottom="0" skin="whiteSkin">
+		<container left="0" right="0" top="0" bottom="0" active="true">
+			<column>
+				<label style="waitingStyle" string="'Waiting...'"/>
+				<picture like="Wait"/>
+			</column>
+		</container>
+	</container>
+
+	<container id="SendUserContainer" left="0" right="0" top="0" bottom="0" skin="whiteSkin">
+		<container left="0" right="0" top="0" bottom="0" active="true">
+			<behavior>
+	    		<method id="onTouchBegan" params="container, id, x, y, ticks"><![CDATA[
+	    			container.first.string = "User sent";
+					application.behavior.sendMessage( "user?user_id=12345" );
+				]]></method>	
+			</behavior>
+			<label anchor="MESSAGE" left="0" right="0" top="0" bottom="0" style="messageStyle" string="'Tap to begin...'"/>
+		</container>
+	</container>
+
+	<container id="MainContainer" left="0" right="0" top="0" bottom="0" skin="whiteSkin">
+		<behavior>
+	        <method id="onCreate" params="container, data"><![CDATA[
+	        	this.data = data;
+	        	container.add( new WaitingContainer );
+			]]></method>
+	        <method id="onK4Discovered" params="container, device"><![CDATA[
+	        	container.replace( container.last, new SendUserContainer( device ) );
+			]]></method>
+	        <method id="onK4Lost" params="container, device"><![CDATA[
+	        	model.data = {};
+	        	container.replace( container.last, new WaitingContainer );
+			]]></method>
+		</behavior>
+	</container>
+	
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<!-- MODEL -->
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+	<script><![CDATA[
+		application.behavior = new ApplicationBehavior();
+		
+		var model = { controller: {} };
+		var data = model.data = {};
+		
+		application.add( new MainContainer( data ) );
+	]]></script>
+</program>

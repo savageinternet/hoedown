@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block title %}K4 Hoedown!{% endblock %}
+{% block css %}
+  <link rel="stylesheet" type="text/css" href="https://k4hoedown.s3.amazonaws.com/task.css" />
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h1 class="text-center">Welcome to Hoedown!</h1>
+      <p class="lead">Imagine yourself as a rancher, square dancer, conquistador, sheriff, outlaw, rodeo clown, or oil baron.  Which would you be?  We've developed highly scientific tests to find out!  Stop by Kinoma at SXSW's Stand 135 and see for yourself!  When you've found your place in the world, come back to this page for some challenges....</p>
+        <div class="kinoma"><img src="https://k4hoedown.s3.amazonaws.com/card/common/kinoma.png" width="152" height="32" alt="" /></div> 
+      <div id="social_actions">
+      	<a href="https://twitter.com/intent/tweet?button_hashtag=k4hoedown" class="twitter-hashtag-button" data-lang="en">Tweet #k4hoedown</a>
+      	<script>!function(d, s, id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+      	<div id="fb-root"></div>
+      	<script>(function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(d.getElementById(id)){return;}js=d.createElement(s);js.id=id;js.src="//connect.facebook.net/en_US/all.js#xfbml=1&appId=139378169467687";fjs.parentNode.insertBefore(js,fjs);}(document,'script','facebook-jssdk'));</script>
+      	<div class="fb-share-button" data-href="http://hoedown.savageinter.net" data=type="button"></div>
+      </div>
+    </div>
+</div>
+{% endblock %}

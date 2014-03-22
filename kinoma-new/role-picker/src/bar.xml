@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module xmlns="http://www.kinoma.com/kpr/1">
+	<container id="HorizontalBar" left="$.left" top="$.top" width="$.width" height="$.height" active="true">
+		<container name="filledIn" left="0" top="0" width="$.width * $.progress / 7.0" height="$.height" />
+		<behavior><![CDATA[
+        	function onCreate(container, data) {
+        		container.skin = new Skin(data.bgColor);
+        		container.filledIn.skin = new Skin(data.fgColor);
+        	}
+		]]></behavior>
+	</container>
+    <script>
+        <![CDATA[
+            
+        ]]>
+    </script>
+</module>

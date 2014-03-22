@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<program xmlns="http://www.kinoma.com/kpr/1">
+	
+	<!-- LOCAL LIBRARIES -->
+	<require id="PageController" path="./PageController" />
+	<require id="Bar" path="./bar" />
+	<require id="Button" path="./button" />
+	<require id="TextLabel" path="./textLabel" />
+	<require id="Theme" path="./theme" />
+	
+	<!-- PAGES -->
+	<require id="WaitingPage" path="./WaitingPage" />
+	<require id="HomePage" path="./HomePage" />
+	<require id="DirectionsPage" path="./DirectionsPage" />
+	<require id="ChaTestPage" path="./ChaTestPage" />
+	<require id="ConTestPage" path="./ConTestPage" />
+	<require id="DexTestPage" path="./DexTestPage" />
+	<require id="IntTestPage" path="./IntTestPage" />
+	<require id="StrTestPage" path="./StrTestPage" />
+	<require id="WisTestPage" path="./WisTestPage" />
+	<require id="ResultsPage" path="./ResultsPage" />
+	<require id="FinishPage" path="./FinishPage" />
+	<require id="ResetPage" path="./ResetPage" />
+
+	<!-- SENSORS -->
+	<require id="Sensors" path="./lib/Sensors" />
+	
+	<!-- REMOTE APPLICATIONS -->
+	<require id="RemoteManager" path="./lib/RemoteManager" />
+	
+	<behavior id="WaitForRemoteBehavior">
+        <method id="onLaunch" params="application"><![CDATA[
+            application.discover( "rodeoremote" );
+		]]></method>
+        <method id="onQuit" params="application"><![CDATA[
+			application.forget( "rodeoremote" );
+		]]></method>
+        <method id="onDiscovered" params="discoveries"><![CDATA[
+			for ( var uuid in RemoteManager ) {
+				var missing = true;
+				for ( var j = 0; j < discoveries.length; j++ ) {
+					if ( discoveries[ j ].uuid == uuid ) {
+				       missing = false;
+				       break;
+				   }
+				}
+				if ( missing ) {
+					//application.invoke(new Message('/waiting'));
+					RemoteManager.unset();
+				}
+			}
+			for ( var j = 0; j < discoveries.length; j++ ) {
+				if (discoveries[ j ].uuid !== RemoteManager.getUuid()) {
+					trace( "### discovered new remote device: " + discoveries[j].location + "\n" );
+					RemoteManager.set(discoveries[j]);
+					//RemoteManager.sendUserId(1);
+					//application.invoke(new Message('/'));
+					break;	// only allow one controller
+				}
+			}
+		]]></method>
+    </behavior>
+
+    <function id="initializeSensors">
+        <![CDATA[
+        	var query = new Object();
+            
+            query.scriptPath = mergeURI( application.url, "scripts/init.js" ).substring( "file://".length );
+            trace("app url: " + application.url + "\n");
+
+            var msg = new Message( "xkpr://shell/hardwarepins/run?" + serializeQuery( query ) );
+            var parameters = new Object();
+
+            parameters.flex = Sensors.addresses.FLEX_A2D;
+            parameters.thermometer_clock = Sensors.addresses.TEMP_I2C_CLOCK;
+            parameters.thermometer_data = Sensors.addresses.TEMP_I2C_DATA;
+            parameters.thermometer_addr = Sensors.addresses.TEMP_ADDR;
+            parameters.BAC_A2D1 = Sensors.addresses.BAC_A2D1;
+            parameters.BAC_VCC1 = Sensors.addresses.BAC_VCC1;
+            parameters.BAC_GND1 = Sensors.addresses.BAC_GND1;
+            parameters.BAC_A2D2 = Sensors.addresses.BAC_A2D2;
+            parameters.BAC_VCC2 = Sensors.addresses.BAC_VCC2;
+            parameters.BAC_GND2 = Sensors.addresses.BAC_GND2;
+            parameters.stretch = Sensors.addresses.STRETCH_A2D;
+        
+            msg.requestText = JSON.stringify( parameters );
+            
+            application.invoke( msg, Message.JSON );
+        ]]>
+    </function> 
+    
+    <behavior id="ApplicationBehavior">
+        <![CDATA[
+            function onComplete( application, message )
+            {
+            	var json = JSON.parse( message.responseText );
+                
+                if( json.op == "init" )
+                {
+                    if( !json.success ) {
+                    	throw new Error;
+                    }
+                }
+            }
+        ]]>
+    </behavior>
+    
+    <function id="readTemp">
+        <![CDATA[
+            var query = new Object();
+        
+        	query.scriptPath = mergeURI( application.url, "scripts/read-temp.js" ).substring( "file:///".length );
+			query.sendParamsOnce = true;
+			query.mseconds = 100;
+
+        	var msg = new Message( "xkpr://shell/hardwarepins/repeat?" + serializeQuery( query ) );
+    		var parameters = new Object();
+       		parameters.addr = Sensors.addresses.TEMP_ADDR;
+            
+            msg.requestText = JSON.stringify( parameters );
+                
+           	application.invoke( msg );
+        ]]>
+    </function>
+    
+    <function id="readFlex">
+        <![CDATA[
+            var query = new Object();
+        
+        	query.scriptPath = mergeURI( application.url, "scripts/read-flex.js" ).substring( "file:///".length );
+			query.sendParamsOnce = true;
+			query.mseconds = 100;
+
+        	var msg = new Message( "xkpr://shell/hardwarepins/repeat?" + serializeQuery( query ) );
+    		var parameters = new Object();
+       		parameters.addr = Sensors.addresses.FLEX_A2D;
+            
+            msg.requestText = JSON.stringify( parameters );
+                
+           	application.invoke( msg );
+        ]]>
+    </function>
+    
+    <function id="readBAC">
+        <![CDATA[
+        	var query = new Object();
+        
+        	query.scriptPath = mergeURI( application.url, "scripts/read-bac.js" ).substring( "file:///".length );
+			query.sendParamsOnce = true;
+			query.mseconds = 100;
+
+        	var msg = new Message( "xkpr://shell/hardwarepins/repeat?" + serializeQuery( query ) );
+    		var parameters = new Object();
+       		parameters.addrs = [Sensors.addresses.BAC_A2D1, Sensors.addresses.BAC_A2D2];
+            
+            msg.requestText = JSON.stringify( parameters );
+                
+           	application.invoke( msg );
+        ]]>
+    </function>
+    
+    <function id="readStretch">
+        <![CDATA[
+        	var query = new Object();
+        
+        	query.scriptPath = mergeURI( application.url, "scripts/read-stretch.js" ).substring( "file:///".length );
+			query.sendParamsOnce = true;
+			query.mseconds = 100;
+
+        	var msg = new Message( "xkpr://shell/hardwarepins/repeat?" + serializeQuery( query ) );
+    		var parameters = new Object();
+       		parameters.addr = Sensors.addresses.STRETCH_A2D;
+            
+            msg.requestText = JSON.stringify( parameters );
+                
+           	application.invoke( msg );
+        ]]>
+    </function>
+    
+    <script><![CDATA[
+    	application.behavior = new WaitForRemoteBehavior();
+        application.shared = true;
+            
+        initializeSensors();
+            
+        //readStretch();
+        //readTemp();
+        //readFlex();
+        //readBAC();
+        
+    	PageController.register('/', HomePage);
+    	PageController.register('/waiting', WaitingPage);
+    	PageController.register('/reset', ResetPage);
+    	
+    	PageController.register('/cha/directions', DirectionsPage.cha);
+    	PageController.register('/con/directions', DirectionsPage.con);
+    	PageController.register('/dex/directions', DirectionsPage.dex);
+    	PageController.register('/int/directions', DirectionsPage.int);
+    	PageController.register('/str/directions', DirectionsPage.str);
+    	PageController.register('/wis/directions', DirectionsPage.wis);
+    	
+    	PageController.register('/cha/test', ChaTestPage);
+    	PageController.register('/con/test', ConTestPage);
+    	PageController.register('/dex/test', DexTestPage);
+    	PageController.register('/int/test', IntTestPage);
+    	PageController.register('/str/test', StrTestPage);
+    	PageController.register('/wis/test', WisTestPage);
+    	
+    	PageController.register('/cha/results', ResultsPage.cha);
+    	PageController.register('/con/results', ResultsPage.con);
+    	PageController.register('/dex/results', ResultsPage.dex);
+    	PageController.register('/int/results', ResultsPage.int);
+    	PageController.register('/str/results', ResultsPage.str);
+    	PageController.register('/wis/results', ResultsPage.wis);
+    	
+    	PageController.register('/finish', FinishPage);
+    	
+    	application.invoke(new Message('/'));
+    ]]></script>
+    
+</program>

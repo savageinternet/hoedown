@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+{% block title %}K4 Hoedown -- {{task}}{% endblock %}
+{% block css %}
+  <link rel="stylesheet" type="text/css" href="https://k4hoedown.s3.amazonaws.com/task.css" />
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-6 col-xs-6">
+      {% if viewer.has_photo %}
+      <img class="img-responsive" src="https://k4hoedown.s3.amazonaws.com/images/{{viewer.code}}.jpg" alt="" />
+      {% else %}
+      <img class="img-responsive" src="https://k4hoedown.s3.amazonaws.com/card/player/player-{{viewer.role}}.jpg" alt="" />
+      {% endif %}
+    </div>
+    <div class="col-md-6 col-xs-6">
+      {% if viewee.has_photo %}
+      <img class="img-responsive" src="https://k4hoedown.s3.amazonaws.com/images/{{viewee.code}}.jpg" alt="" />
+      {% else %}
+      <img class="img-responsive" src="https://k4hoedown.s3.amazonaws.com/card/player/player-{{viewee.role}}.jpg" alt="" />
+      {% endif %}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <h1 class="text-center">{% block task %}{% endblock %}</h1>
+      <p class="lead">{% block taskstory %}{% endblock %}</p>
+      {% block taskbody %}{% endblock %}
+      {% if not is_custom_task %}
+      <div id="social_actions">
+        <div id="twitter_action">
+          <a href="https://twitter.com/intent/tweet?button_hashtag=k4hoedown" class="twitter-hashtag-button" data-size="large">Tweet #k4hoedown</a>
+          <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+        </div>
+        <div id="fb_action">
+          <div id="fb-root"></div>
+          <script>(function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=217389591802151";
+            fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));
+          </script>
+          <div class="fb-share-button" data-href="http://hoedown.savageinter.net" data-type="button"></div>
+        </div>
+      </div>
+      <p class="lead">
+        Once you're done, come back to this page and tap/click this button to complete the task:
+      </p>
+      <form action="/users/{{viewee.code}}/complete" method="POST">
+        {% csrf_token %}
+        <input type="submit" class="btn btn-lg btn-success col-md-12 col-xs-12 btn-task-completed" value="Task Completed!" />
+      </form>
+      {% endif %}
+    </div>
+</div>
+{% endblock %}

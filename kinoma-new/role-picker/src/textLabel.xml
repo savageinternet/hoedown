@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module xmlns="http://www.kinoma.com/kpr/1">
+    <container id="TextLabel" left="$.left" top="$.top" width="$.width" height="$.height" active="true">
+		<label string="$.text" />
+		<behavior><![CDATA[
+        	function onCreate(container, data) {
+        		container.first.style = data.style;
+        	}
+		]]></behavior>
+	</container>
+</module>

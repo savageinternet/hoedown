@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <title>{% block title %}K4 Hoedown{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="https://k4hoedown.s3.amazonaws.com/bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="https://k4hoedown.s3.amazonaws.com/main.css" />
+    {% block css %}{% endblock %}
+    <script src="https://k4hoedown.s3.amazonaws.com/webfont.js"></script>
+    <script>
+    WebFont.load({
+      custom: {
+        families: ['Tex Gyre Schola:n4,n7,i4,i7'],
+        urls: ['https://k4hoedown.s3.amazonaws.com/fonts.css']
+      }
+    });
+    </script>
+  </head>
+  <body>
+    {% block content %}{% endblock %}
+    <script src="https://k4hoedown.s3.amazonaws.com/jquery.js"></script>
+    <script src="https://k4hoedown.s3.amazonaws.com/bootstrap/js/bootstrap.js"></script>
+    <script src="https://k4hoedown.s3.amazonaws.com/underscore.js"></script>
+    {% block jsFoot %}{% endblock %}
+  </body>
+</html>

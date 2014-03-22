@@ -1,0 +1,80 @@
+.values {
+    height: 20px;
+    width: 175px;
+    margin-bottom: 8px;
+}
+
+.value-label {
+    font-size: 150%;
+}
+
+.value1 {
+    background-image: url(http://k4hoedown.s3.amazonaws.com/card/value-sprite.png);
+    background-position: 0px -120px;
+}
+.value2 {
+    background-image: url(http://k4hoedown.s3.amazonaws.com/card/value-sprite.png);
+    background-position: 0px -100px;
+}
+.value3 {
+    background-image: url(http://k4hoedown.s3.amazonaws.com/card/value-sprite.png);
+    background-position: 0px -80px;
+}
+.value4 {
+    background-image: url(http://k4hoedown.s3.amazonaws.com/card/value-sprite.png);
+    background-position: 0px -60px;
+}
+.value5 {
+    background-image: url(http://k4hoedown.s3.amazonaws.com/card/value-sprite.png);
+    background-position: 0px -40px;
+}
+.value6 {
+    background-image: url(http://k4hoedown.s3.amazonaws.com/card/value-sprite.png);
+    background-position: 0px -20px;
+}
+.value7 {
+    background-image: url(http://k4hoedown.s3.amazonaws.com/card/value-sprite.png);
+    background-position: 0px -0px;
+}
+
+.numbers {
+    width:20px;
+    height:20px;
+    vertical-align:middle;
+    display: inline-block;
+}
+
+.number1 {
+    background-image: url(http://k4hoedown.s3.amazonaws.com/card/number-sprite.png);
+    background-position: 0px 0px;
+}
+
+.number2 {
+    background-image: url(http://k4hoedown.s3.amazonaws.com/card/number-sprite.png);
+    background-position: -20px 0px;
+}
+
+.number3 {
+    background-image: url(http://k4hoedown.s3.amazonaws.com/card/number-sprite.png);
+    background-position: -40px 0px;
+}
+
+.number4 {
+    background-image: url(http://k4hoedown.s3.amazonaws.com/card/number-sprite.png);
+    background-position: -60px 0px;
+}
+
+.number5 {
+    background-image: url(http://k4hoedown.s3.amazonaws.com/card/number-sprite.png);
+    background-position: -80px 0px;
+}
+
+.number6 {
+    background-image: url(http://k4hoedown.s3.amazonaws.com/card/number-sprite.png);
+    background-position: -100px 0px;
+}
+
+.number7 {
+    background-image: url(http://k4hoedown.s3.amazonaws.com/card/number-sprite.png);
+    background-position: -120px 0px;
+}

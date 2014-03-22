@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module xmlns="http://www.kinoma.com/kpr/1">
+	<container id="Button" left="$.left" top="$.top" width="$.width" height="$.height" active="!$.disabled">
+		<label string="$.value" left="$.padding" right="$.padding" top="$.padding" bottom="$.padding" />
+		<behavior><![CDATA[
+        	function onCreate(container, data) {
+        		this.color = data.color;
+        		this.active = data.active;
+        		this.action = data.action;
+        		this.disabled = data.disabled || false;
+        		if (this.disabled) {
+        			container.skin = new Skin('#bbb');
+        		} else {
+        			container.skin = new Skin(this.color);
+        		}
+        		container.first.style = data.style;
+        	}
+        	
+        	function onTouchBegan(container) {
+        		container.skin = new Skin(this.active);
+        	}
+        	
+        	function onTouchEnded(container) {
+        		container.skin = new Skin(this.color);
+        		this.action();
+        	}
+		]]></behavior>
+	</container>
+</module>

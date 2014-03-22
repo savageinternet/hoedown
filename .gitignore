@@ -1,0 +1,9 @@
+*.DS_Store
+bin
+target
+.settings
+.metadata
+.vagrant
+db.sqlite3
+*.pyc
+k4pop/web/static/images/*.jpg

@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="utf-8"?>
+<program xmlns="http://www.kinoma.com/kpr/1">
+
+	<require path="themes/sample/theme" id="THEME"/>
+	<require path="mobile/model" id="MODEL"/>
+	<require path="mobile/screen" id="SCREEN"/>
+	<require path="mobile/control" id="CONTROL"/>
+	<require path="mobile/keyboard" id="KEYBOARD"/>
+
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<!-- ASSETS -->
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    
+	<skin id="blackSkin" color="black"/>
+	<skin id="graySkin" color="gray"/>
+	<skin id="whiteSkin" color="white"/>
+	
+	<texture id="arrowsTexture" large="./assets/arrows100x100.png"/>
+	<skin id="arrowsSkin" texture="arrowsTexture" x="0" y="0" width="50" height="50">
+		<variants offset="48"/>
+	</skin>
+	<texture id="shutterButtonTexture" large="./assets/shutter-button140x140.png"/>
+	<skin id="shutterButtonSkin" texture="shutterButtonTexture" x="0" y="0" width="70" height="70" aspect="fit">
+		<states offset="70"/>
+	</skin>
+	<skin id="nameInputSkin">
+		<borders left="2" top="2" right="2" bottom="2" color="gray"/>
+	</skin>
+
+	<effect id="maskEffect">
+		<colorize color="#aa000000"/>
+	</effect>
+
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<!-- STYLES -->
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+	<style id="applicationStyle" font="18px HelveticaNeue,Roboto" color="black" align="left,middle"/>
+	<script>
+		application.style = applicationStyle;
+	</script>
+	<style id="waitingStyle" font="64px" color="#aaa" align="center,top">
+		<margins top="20" bottom="-50"/>
+	</style>
+	<style id="uploadStyle" font="28px" color="#aaa" align="center,middle"/>
+	<style id="labelLeftStyle" font="30px" color="#aaa" align="left,middle"/>
+	<style id="labelRightStyle" font="30px" color="#aaa" align="right,middle"/>
+	<style id="fieldStyle" font="bold 24px" color="black" align="left,middle">
+		<margins left="5" right="5" top="5" bottom="5"/>
+	</style>
+	<style id="fieldHintStyle" font="24px" color="#aaa" align="left,middle">
+		<margins left="5" right="5" top="5" bottom="5"/>
+	</style>
+	
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<!-- HANDLERS -->
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+	<!-- The /user handler is called from K4 to kick off a new user session -->
+	
+    <handler path="/user">
+ 		<behavior like="MODEL.ScreenBehavior">
+			<method id="onDescribe" params="query, selection"><![CDATA[
+				var data = {
+					Screen: PreviewScreen,
+					user_id: query.user_id,
+					uri_preview: mergeURI( application.url, "assets/preview.yuv" ),
+					uri_capture: mergeURI( Files.picturesDirectory, application.di + ".photo.jpg")
+				};
+				return data;
+			]]></method>
+		</behavior>
+    </handler>
+
+	<handler path="/main">
+		<behavior like="MODEL.ScreenBehavior">
+	        <method id="onDescribe" params="query, selection"><![CDATA[
+	        	return {
+	        		Screen: WaitingScreen,
+                    selection: -1
+				}
+			]]></method>
+		</behavior>
+	</handler>
+
+	<handler path="/photo">
+		<behavior like="MODEL.ScreenBehavior">
+			<method id="onDescribe" params="query, selection"><![CDATA[
+				var data = {
+					Screen: PhotoScreen,
+					uri: query.uri,
+					user_id: query.user_id,
+					name: ""
+				};
+				return data;
+			]]></method>
+		</behavior>
+	</handler>
+
+	<handler path="/send">
+		<behavior like="MODEL.ScreenBehavior">
+			<method id="onDescribe" params="query, selection"><![CDATA[
+				var data = {
+					Screen: UploadScreen,
+					uri: query.uri,
+					user_id: query.user_id,
+					name: query.name,
+					message: "Uploading image...",
+				};
+				return data;
+			]]></method>
+		</behavior>
+	</handler>
+
+	<!-- Upload the image to the server -->
+	<handler path="/upload">
+        <behavior>
+        	<method id="onInvoke" params="handler, message"><![CDATA[
+				var query = parseQuery( message.query );
+        		var user_id = query.user_id;
+        		var file = query.uri;
+				var slash = file.lastIndexOf("/");
+				var name = file.slice(slash + 1);
+				
+				var boundary = "valkyrieheartsevan"
+				var message = new Message('http://hoedown.savageinter.net/users/' + user_id + '/persona?name=' + query.name );
+				message.method = "POST";
+				handler.upload(message, file, 0);
+				return;
+				
+				message.setRequestHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
+				
+				var body = "--" + boundary + "\r\n";
+				
+				body += "Content-type: text/plain\r\n";
+				body += "Content-Disposition: form-data; name=title" + "\r\n\r\n";
+				body += query.name;
+				body += "\r\n";
+
+				body += "--" + boundary + "\r\n";
+				body += "Content-type: application/octet-stream\r\n";
+				body += "Content-Disposition: form-data; name=file" + "\r\n\r\n";
+				
+				var at = body.length;
+				handler.upload(message, file, at);
+				
+				body +=  "\r\n--" + boundary + "--\r\n";
+				
+				message.requestText = body;
+				
+			]]></method>
+        </behavior>
+	</handler>
+
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<!-- BEHAVIORS -->
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    
+	<behavior id="ApplicationBehavior" like="MODEL.ApplicationBehavior">
+        <method id="onCreate" params="application, data, context"><![CDATA[
+			MODEL.ApplicationBehavior.prototype.onCreate.call( this, application, data, context );
+		]]></method>
+        <method id="onLaunch" params="application"><![CDATA[
+ 			MODEL.ApplicationBehavior.prototype.onLaunch.call( this, application );
+            application.shared = true;
+		]]></method>
+        <method id="onQuit" params="application"><![CDATA[
+        	application.shared = false;
+			MODEL.ApplicationBehavior.prototype.onQuit.call( this, application );
+		]]></method>
+		<method id="onAdapt" params="application"><![CDATA[
+			if ( "width" in application ) {
+				if ( !( "width" in this ) )
+					this.width = application.width;
+				else {
+					var width = application.width;
+					if ( this.width != width ) {
+						this.width = width;
+						application.distribute( "onDeviceOrientationChange" );
+					}
+				}
+			}
+		]]></method>	
+	</behavior>
+
+	<behavior id="CameraScreenBehavior">
+		<method id="onCreate" params="container, data"><![CDATA[
+			this.data = data;
+            this.container = container;
+            this.use_camera = ( "android" == system.platform );
+            this.video_track = null;
+            this.photo_track = null;
+            this.reader = null;
+			this.load();
+		]]></method>
+ 		<method id="onDisplaying" params="container"><![CDATA[
+			this.reader.start();
+
+			container.coordinates = { width: this.dimensions.width, height: this.dimensions.height };
+			container.origin = { x: this.dimensions.width >> 1, y: this.dimensions.height >> 1 };
+			this.onDeviceOrientationChange( container );
+
+			if ( !this.use_camera ) {
+				container.time = 0;
+				container.interval = 16;
+				container.start();
+			}
+		]]></method>
+  		<method id="onUndisplayed" params="container"><![CDATA[
+  			if ( this.reader ) {
+  				this.reader.stop();
+  				this.reader.close();
+  				this.reader = null;
+  			}
+		]]></method>
+  		<method id="onLoaded" params="container"><![CDATA[
+			this.onDeviceOrientationChange( container );
+		]]></method>
+  		<method id="onDeviceOrientationChange" params="container"><![CDATA[
+            var x_scale, y_scale, fit_width, fit_height;
+            
+            if ( application.width > application.height ) {
+            	fit_width = application.width - container.container.coordinates.right - container.container.coordinates.left;
+            	fit_height = application.height - container.container.coordinates.bottom - container.container.coordinates.top;
+				x_scale = fit_width / this.dimensions.width;
+                y_scale = fit_height / this.dimensions.height;
+				container.rotation = 0;
+			}
+			else {
+            	fit_height = application.width - container.container.coordinates.right - container.container.coordinates.left;
+            	fit_width = application.height - container.container.coordinates.bottom - container.container.coordinates.top;
+                x_scale = fit_width / this.dimensions.width;
+                y_scale = fit_height/ this.dimensions.height;
+				container.rotation = 90;
+			}
+            
+            var scale = x_scale > y_scale ? y_scale : x_scale;
+            if ( container.scale.x != scale || container.scale.y != scale )
+				container.scale = { x: scale, y: scale };
+		]]></method>
+  		<method id="onTimeChanged" params="container"><![CDATA[
+			this.onDataArrived( container );
+		]]></method>
+    	<method id="onDataArrived" params="container"><![CDATA[
+            this.refresh( container );
+            return true;
+		]]></method>
+   		<method id="onMediaDataArrived"><![CDATA[
+            application.distribute( "onDataArrived" );
+		]]></method>
+    	<method id="capture"><![CDATA[
+            this.photo_track.set( FskMediaProperty.enabled, true );
+		]]></method>
+    	<method id="load"><![CDATA[
+            var mime, uri = "";
+            if ( this.use_camera )
+                mime = "video/x-kinoma-capture";
+            else {
+                var chunk = Files.readChunk( this.data.uri_preview );
+                mime = FskMediaReader.canHandle( chunk );
+                chunk.free();
+                uri = this.data.uri_preview;
+            }
+            
+            var reader = this.reader = new FskMediaReader( uri, mime );
+            
+            reader.container = this.container;
+            reader.refresh   = this.refresh;
+            reader.onMediaDataArrived = this.onMediaDataArrived;
+        
+            if ( !reader ) throw "Unable to create media reader";
+			
+			var track, trackIndex = 0;
+			while ( track = reader.getTrack( trackIndex++ ) ) {
+				var mediaType = track.get( FskMediaProperty.mediaType );
+				if ( "video-preview" == mediaType )
+					break;
+            }
+			if ( !track )
+				throw "No video preview track";
+            else
+                this.video_preview_track = track;
+
+            trackIndex = 0;
+			while ( track = reader.getTrack( trackIndex++ ) ) {
+				if ( "image" == track.get( FskMediaProperty.mediaType ) )
+					break;
+			}
+			if ( !track )
+				throw "No photo track";
+            else
+                this.photo_track = track;
+
+			this.formatInfo = this.video_preview_track.get( FskMediaProperty.formatInfo );
+			this.format = this.video_preview_track.get( FskMediaProperty.format );
+            this.dimensions = this.video_preview_track.get( FskMediaProperty.dimensions );
+		]]></method>
+    	<method id="refresh" params="container"><![CDATA[
+			while ( true ) {
+				var data = this.reader.extract();
+				if ( !data || !data.info )
+					break;
+
+                if ( this.photo_track == data.track ) {
+                    this.photo_track.set( FskMediaProperty.enabled, false );
+                    application.distribute( "onPhotoCaptured", data.chunk );
+					data.chunk.free();
+					continue;
+				}
+
+				var info = data.info[0];
+				if ( ( 1 != info.samples ) || ( 1 != data.info.length ) )
+					throw "Unexpected sample info";
+
+                container.load( data.chunk, this.format, this.formatInfo );
+				data.chunk.free();
+
+				break;
+			}
+		]]></method>
+	</behavior>
+
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<!-- LAYOUTS -->
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+	<variable id="footerHeight" value="shutterButtonSkin.height"/>
+	
+	<picture id="Wait" width="200" height="200" url="'./assets/waiting-dark.png'">
+		<behavior>
+			<method id="onCreate" params="picture, data"><![CDATA[
+				picture.origin = { x:100, y:100 };
+				picture.scale = { x:0.5, y:0.5 };
+			]]></method>	
+			<method id="onDisplaying" params="picture"><![CDATA[
+				picture.start();
+			]]></method>	
+			<method id="onTimeChanged" params="picture"><![CDATA[
+				var rotation = picture.rotation;
+				rotation -= 5;
+				if (rotation < 0) rotation = 360;
+				picture.rotation = rotation;
+			]]></method>	
+		</behavior>
+	</picture>
+
+	<!-- Waiting for user id -->
+	
+	<container id="WaitingScreen" left="0" right="0" top="0" bottom="0" skin="whiteSkin">
+		<container left="0" right="0" top="0" bottom="0">
+		<behavior>
+			<method id="onScreenBegan" params="container, backwards, delta"><![CDATA[
+				application.focus();
+			]]></method>
+		</behavior>	
+			<column>
+				<label style="waitingStyle" string="'Waiting...'"/>
+				<picture like="Wait"/>
+			</column>
+		</container>
+	</container>
+	
+	<!-- Take a picture -->
+	
+	<container id="PreviewScreen" left="0" right="0" top="0" bottom="0" skin="whiteSkin">
+		<container left="10" right="10" top="10" bottom="footerHeight">
+			<picture anchor="PREVIEW" behavior="CameraScreenBehavior" left="0" right="0" top="0" bottom="0"/>
+		</container>
+		<container left="0" right="0" bottom="0" height="footerHeight">
+			<column left="0">
+				<line active="true">
+					<behavior>
+			    		<method id="onTouchBegan" params="content, id, x, y, ticks"><![CDATA[
+							content.invoke( new Message( "/back" ) );
+						]]></method>	
+			        </behavior>
+					<content left="0" skin="arrowsSkin"/>
+					<label style="labelLeftStyle" string="'Cancel'"/>
+				</line>
+			</column>
+			<column left="0" right="0">
+				<line>
+					<content skin="shutterButtonSkin" state="1" active="true">
+						<behavior>
+				    		<method id="onCreate" params="container, data"><![CDATA[
+				    			this.data = data;
+				    			this.sound = new Sound( mergeURI( application.url, "assets/shutter-02.wav" ) );
+							]]></method>	
+				    		<method id="onTouchBegan" params="content, id, x, y, ticks"><![CDATA[
+				    			content.state = 0;
+							]]></method>	
+				     		<method id="onTouchEnded" params="content, id, x, y, ticks"><![CDATA[
+				    			content.state = 1;
+								Sound.volume = 1.0;
+								this.sound.play();
+								content.wait( 100 );
+							]]></method>	
+				     		<method id="onComplete" params="container"><![CDATA[
+								this.data.PREVIEW.delegate( "capture" );
+							]]></method>	
+							<method id="onPhotoCaptured" params="content, chunk"><![CDATA[
+								Files.deleteFile( this.data.uri_capture );
+								Files.writeChunk( this.data.uri_capture, chunk );
+								content.invoke( new Message( "/photo?" + serializeQuery( { uri: this.data.uri_capture, user_id: this.data.user_id } ) ) );
+							]]></method>
+				        </behavior>
+					</content>
+				</line>
+			</column>
+		</container>
+	</container>
+
+	<!-- Enter your name -->
+
+	<container id="PhotoScreen" left="0" right="0" top="0" bottom="0" skin="whiteSkin">
+		<container left="0" right="0" top="0" bottom="0" active="true">
+			<behavior>
+				<method id="onCreate" params="container, data"><![CDATA[
+					this.data = data;
+				]]></method>	
+				<method id="onFocused" params="container"><![CDATA[
+					KEYBOARD.hide();
+				]]></method>	
+				<method id="onKeyDown" params="container, key, repeat, ticks"><![CDATA[
+					var code = key.charCodeAt(0);
+					if (code == 13) {
+						var button = this.data.UPLOAD;
+						if (button.active)
+							//button.delegate("onTouchBegan");
+							KEYBOARD.hide();
+						return true;
+					}
+				]]></method>	
+				<method id="onTouchBegan" params="container"><![CDATA[
+					container.focus();
+				]]></method>
+				<method id="onDisplayed" params="container"><![CDATA[
+					this.data.NAME.focus();
+				]]></method>
+				<method id="onUndisplayed" params="container"><![CDATA[
+					KEYBOARD.hide();
+				]]></method>
+			</behavior>
+			<container left="10" right="10" top="10" bottom="footerHeight">
+				<picture left="0" right="0" top="0" bottom="0" url="$.uri"/>
+			</container>
+			<container left="0" right="0" bottom="0" height="footerHeight">
+				<column left="0">
+					<line active="true">
+						<behavior>
+				    		<method id="onTouchBegan" params="content, id, x, y, ticks"><![CDATA[
+								KEYBOARD.hide();
+								content.invoke( new Message( "/back" ) );
+							]]></method>	
+				        </behavior>
+						<content left="0" skin="arrowsSkin"/>
+						<label style="labelLeftStyle" string="'Retake'"/>
+					</line>
+				</column>
+				<column>
+					<container width="150" height="36" skin="nameInputSkin">
+						<scroller left="4" right="4" top="4" bottom="4" active="true" clip="true" behavior="CONTROL.FieldScrollerBehavior">
+							<label anchor="NAME" left="0" top="0" bottom="0" editable="true" skin="THEME.fieldLabelSkin" style="fieldStyle" string="$.name">
+								<behavior like="CONTROL.FieldLabelBehavior"><![CDATA[
+									function onEdited(label) {
+										var data = this.data;
+										data.name = label.string;
+										data.UPLOAD.delegate("onEdited");
+										label.container.next.visible = ( data.name.length == 0 );
+									}
+								]]></behavior>
+							</label>
+						</scroller>
+						<label left="4" right="4" top="4" bottom="4" style="fieldHintStyle" string="'Add name'"/>
+					</container>
+				</column>
+				<column right="0">
+					<line anchor="UPLOAD" active="false">
+						<behavior>
+				    		<method id="onCreate" params="container, data"><![CDATA[
+				    			this.data = data;
+							]]></method>	
+				    		<method id="onTouchBegan" params="container, id, x, y, ticks"><![CDATA[
+								KEYBOARD.hide();
+								container.invoke( new Message( "/send?" + serializeQuery( { uri: this.data.uri, user_id: this.data.user_id, name: this.data.name } ) ) );
+							]]></method>	
+				    		<method id="onEdited" params="container"><![CDATA[
+								container.active = (0 != this.data.name.length);
+								container.last.variant = ( container.active ? 1 : 2 );
+							]]></method>	
+				        </behavior>
+						<label style="labelRightStyle" string="'Next'"/>
+						<content right="0" skin="arrowsSkin" variant="2"/>
+					</line>
+				</column>
+			</container>
+		</container>
+	</container>
+
+	<!-- Upload the photo/name -->
+
+	<container id="UploadScreen" left="0" right="0" top="0" bottom="0" skin="whiteSkin">
+		<container left="0" right="0" top="0" bottom="0">
+			<behavior>
+	    		<method id="onCreate" params="container, data"><![CDATA[
+	    			this.data = data;
+	    			var message = new Message( "/upload?" + serializeQuery( { uri: this.data.uri, user_id: this.data.user_id, name: this.data.name } ) );
+	    			container.invoke( message, Message.TEXT );
+				]]></method>	
+	    		<method id="onComplete" params="container, message, result"><![CDATA[
+	     			this.data.MESSAGE.string = "Upload complete!";
+	    			this.onUploaded( container );
+				]]></method>	
+	    		<method id="onError" params="container, message, result"><![CDATA[
+	     			this.data.MESSAGE.string = "Upload failed!";
+	    			this.onUploaded( container );
+				]]></method>	
+	     		<method id="onUploaded" params="container"><![CDATA[
+	     			this.data.WAIT.stop();
+	     			this.data.WAIT.visible = false;
+	    			container.duration = 2000;
+	    			container.start();
+				]]></method>	
+	     		<method id="onFinished" params="container"><![CDATA[
+	     			container.invoke( new Message( "/home" ) );
+				]]></method>	
+	        </behavior>
+			<container left="0" right="0" top="0" bottom="0" active="true">
+				<container left="10" right="10" top="10" bottom="footerHeight">
+					<picture left="0" right="0" top="0" bottom="0" url="$.uri">
+						<behavior>
+				    		<method id="onLoaded" params="picture"><![CDATA[
+								//picture.effect = maskEffect;
+							]]></method>	
+				        </behavior>
+					</picture>
+					<picture anchor="WAIT" like="Wait" url="'./assets/waiting-light.png'"/>
+				</container>
+				<container left="0" right="0" bottom="0" height="footerHeight">
+					<column left="0">
+						<line active="true">
+							<behavior>
+					    		<method id="onTouchBegan" params="content, id, x, y, ticks"><![CDATA[
+									content.invoke( new Message( "/back" ) );
+								]]></method>	
+					        </behavior>
+							<content left="0" skin="arrowsSkin"/>
+							<label style="labelLeftStyle" string="'Name'"/>
+						</line>
+					</column>
+					<column left="0" right="0">
+						<label anchor="MESSAGE" left="0" right="0" style="uploadStyle" string="$.message"/>
+					</column>
+				</container>
+			</container>
+		</container>
+	</container>
+
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<!-- MODEL -->
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+	<script><![CDATA[
+		var model = application.behavior = new ApplicationBehavior( application );
+		model.controller = {};
+	]]></script>
+</program>

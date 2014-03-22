@@ -1,0 +1,35 @@
+{% extends "task.html" %}
+{% block task %}
+Heads-up
+{% endblock %}
+{% block taskstory %}
+{% if error %}
+  <span class="text-danger">{{error}}</span>
+  <br />
+{% endif %}
+Before you can outwit the outlaws that roam these lands, you'll need your wits about you.
+Try this puzzle on for size:
+{% endblock %}
+{% block taskbody %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <img src="https://k4hoedown.s3.amazonaws.com/logic/{{image_filename}}" class="img-responsive" />
+    </div>
+    <div class="col-md-6">
+      <p style="font-size: 125%;">{{puzzle}}</p>
+    </div>
+    <div class="col-md-12">
+      <form action="/users/{{viewee.code}}/checkLogicPuzzle" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="id" value="{{id}}">
+        <div class="form-group">
+          <label style="font-size: 150%;" for="answer">Your answer</label>
+          <input class="form-control" type="text" id="answer" name="answer" />
+        </div>
+        <input type="submit" class="btn btn-lg btn-success" value="Are we right?" />
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

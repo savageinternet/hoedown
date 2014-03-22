@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block title %}K4 Hoedown -- Game Central{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h1 class="text-center">K4 Hoedown: Game Central</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <a href="/admin/users" class="btn btn-lg btn-primary">Users</a>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <a class="twitter-timeline" href="https://twitter.com/search?q=%23k4hoedown" data-widget-id="439799792009367552">Tweets about "#k4hoedown"</a>
+      <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    </div>
+  </div>
+</div>
+{% endblock %}

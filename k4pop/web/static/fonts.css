@@ -1,0 +1,27 @@
+@font-face {
+  font-family: "Tex Gyre Schola";
+  font-style: normal;
+  font-weight: normal;
+  src: url(fonts/texgyreschola-regular.otf);
+}
+
+@font-face {
+  font-family: "Tex Gyre Schola";
+  font-style: normal;
+  font-weight: bold;
+  src: url(fonts/texgyreschola-bold.otf);
+}
+
+@font-face {
+  font-family: "Tex Gyre Schola";
+  font-style: italic;
+  font-weight: normal;
+  src: url(fonts/texgyreschola-italic.otf);
+}
+
+@font-face {
+  font-family: "Tex Gyre Schola";
+  font-style: italic;
+  font-weight: bold;
+  src: url(fonts/texgyreschola-bolditalic.otf);
+}

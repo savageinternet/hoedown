@@ -1,0 +1,128 @@
+{% extends "layout.html" %}
+{% block title %}K4 Hoedown -- Game Central{% endblock %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="https://k4hoedown.s3.amazonaws.com/admin/list.css" />
+{% endblock %}
+{% block content %}
+<div class="modal fade" id="modal_upload_photo">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Upload Photo</h4>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="photo_user_code" value="" />
+        <div>
+          <video id="video_upload_photo" autoplay></video>
+          <canvas id="canvas_upload_photo" class="hide"></canvas>
+        </div>
+        <div>
+          <button class="btn btn-lg btn-default" id="btn_take_photo">
+            <span class="glyphicon glyphicon-camera"></span>
+          </button>
+        </div>
+        <div id="photo_timer" class="hide"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h1 class="text-center">K4 Hoedown: Game Central</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <a href="/admin" class="btn btn-lg btn-primary">Dashboard</a>
+    </div>
+  </div>
+  <div class="row" id="list_users">
+  {% for user in users %}
+    <div class="col-md-12">
+      <div class="panel panel-default panel-user">
+        <div class="panel-heading">
+          <div class="panel-title">
+            <form class="form-user-name form-inline" action="/admin/users/{{user.code}}/name" method="POST">
+              {% csrf_token %}
+              <div class="form-group">
+                <input type="text" name="name" class="form-control" placeholder="name" value="{{user.name}}" />
+              </div>
+              <input type="submit" class="btn btn-default" value="Update Name" />
+            </form>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-3">
+              <div>
+                <h4>{{user.role_name}}</h4>
+                <small class="text-muted">{{user.created}}</small>
+              </div>
+              {% if user.has_photo %}
+              <img class="img-responsive" id="profile_pic_{{user.code}}" src="https://k4hoedown.s3.amazonaws.com/images/{{user.code}}.jpg" alt="" />
+              {% else %}
+              <img class="img-responsive" id="profile_pic_{{user.code}}" src="https://k4hoedown.s3.amazonaws.com/card/player/player-{{user.role}}.jpg" alt="" />
+              {% endif %}
+            </div>
+            <div class="col-md-9">
+              <form action="/admin/users/{{user.code}}/stats" method="POST">
+              <table class="table table-condensed">
+                <thead>
+                  <tr>
+                    <th>INT</th>
+                    <th>WIS</th>
+                    <th>STR</th>
+                    <th>CON</th>
+                    <th>DEX</th>
+                    <th>CHA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><input name="int" type="number" min="1" max="7" step="1" value="{{user.int}}" /></td>
+                    <td><input name="wis" type="number" min="1" max="7" step="1" value="{{user.wis}}" /></td>
+                    <td><input name="str" type="number" min="1" max="7" step="1" value="{{user.str}}" /></td>
+                    <td><input name="con" type="number" min="1" max="7" step="1" value="{{user.con}}" /></td>
+                    <td><input name="dex" type="number" min="1" max="7" step="1" value="{{user.dex}}" /></td>
+                    <td><input name="cha" type="number" min="1" max="7" step="1" value="{{user.cha}}" /></td>
+                  </tr>
+                </tbody>
+              </table>
+              {% csrf_token %}
+              <input type="submit" class="btn btn-default" value="Update Stats" />
+            </form>
+            <div class="user-actions panel panel-success">
+              <div class="panel-heading">
+                <div class="panel-title">User Actions</div>
+              </div>
+              <div class="panel-body">
+              <div class="btn-group">
+                <a href="/admin/users/{{user.code}}" class="btn btn-lg btn-default">View</a>
+                <a href="/users/{{user.code}}/viewCard" class="btn btn-lg btn-default">View Card</a>
+                <a href="/admin/users/{{user.code}}/printCard" class="btn btn-lg btn-default">Print Card</a>
+                {% if user.has_photo %}
+                  <button class="btn btn-lg btn-default btn-upload-photo" data-code="{{user.code}}" data-toggle="modal" data-target="#modal_upload_photo">Retake Photo</button>
+                {% else %}
+                  <button class="btn btn-lg btn-success btn-upload-photo" data-code="{{user.code}}" data-toggle="modal" data-target="#modal_upload_photo">Upload Photo</button>
+                {% endif %}
+              </div>
+              </div>
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+</div>
+{% endblock %}
+{% block jsFoot %}
+    <script src="https://k4hoedown.s3.amazonaws.com/admin/list.js"></script>
+{% endblock %}

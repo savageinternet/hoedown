@@ -1,0 +1,31 @@
+html.wf-loading > body, html.wf-inactive > body {
+  font-family: serif;
+}
+
+html.wf-active > body {
+  font-family: 'Tex Gyre Schola';
+}
+
+html, body {
+  color: #929292;
+}
+
+.unselectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline-style:none;
+}
+
+.panel-success > .panel-heading {
+  background-color: #6FAA45;
+  color: #fff;
+}
+
+.btn-task-completed {
+  font-size: 200%;
+  margin-bottom: 20px;
+}

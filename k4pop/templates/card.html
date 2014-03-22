@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<title>K4 Hoedown -- {{user.name}}</title>
+<style type="text/css">
+<!--
+html, body {
+    margin: 0px;
+    padding: 0px;
+    font-family: 'Tex Gyre Schola', serif;
+    line-height: 1.1em;
+    font-size: 16px;
+}
+
+table {
+    border-spacing: 0;
+}
+.playerName {
+    {% if role_layout.player_name_inverted %}
+    color: #fff;
+    {% else %}
+    color: #000;
+    {% endif %}
+    font-size: 30px;
+    margin-top: 40px;
+    position: relative;
+    text-align: center;
+}
+.playerImage {
+    width: 384px;
+    height: 288px;
+    position: absolute;
+    margin-top: 32px;
+}
+.clown-header {
+    background-image: url("https://k4hoedown.s3.amazonaws.com/card/header/header-{{user.role}}.jpg");
+    width: 384px;
+    height: 72px;
+    position: absolute;
+    z-index: 20;
+}
+.glyph-bottom-right {
+    background-image: url("https://k4hoedown.s3.amazonaws.com/card/glyph/glyph-bottom-right-{{user.role}}.png");
+    background-repeat:no-repeat;
+    {% if user.role == 4 %}
+    width: 140px;
+    {% else %}
+    width: 70px;
+    {% endif %}
+    height: 62px;
+    position: absolute;
+    z-index: 20;
+    margin-top: 216px;
+    {% if user.role == 4 %}
+    margin-left: 240px;
+    {% else %}
+    margin-left: 310px;
+    {% endif %}
+}
+.glyph-top-left {
+  background-image: url("https://k4hoedown.s3.amazonaws.com/card/glyph/glyph-top-left-{{user.role}}.png");
+  background-repeat:no-repeat;
+  width: 80px;
+  height: 100px;
+  position: absolute;
+  z-index: 20;
+  margin-left: 10px;
+  margin-top: 66px;
+}
+
+.lowerSection {
+    width: 384px;
+    height: 300px;
+    position: absolute;
+    background-color: white;
+    margin-top: 280px;
+}
+.lowerColumns, .lowerColumns td {
+    margin-top: 6px;
+    vertical-align: top;
+    font-family: 'Trebuchet', 'Trebuchet Ms', sans-serif;
+}
+.lowerColumns instructions {
+    font-size: 18px;
+}
+.instructionsElement {
+    font-size: 13px;
+    line-height: 15px;
+    padding-bottom: 6px;
+}
+
+.valueLabel {
+    font-weight: 700;
+}
+
+.values {
+    height: 20px;
+    width: 175px;
+    margin-bottom: 8px;
+}
+
+.values.last {
+    margin-bottom: 0px;
+}
+.value1 {
+    background-image: url("https://k4hoedown.s3.amazonaws.com/card/common/value-sprite.png");
+    background-position: 0px -120px;
+}
+.value2 {
+    background-image: url("https://k4hoedown.s3.amazonaws.com/card/common/value-sprite.png");
+    background-position: 0px -100px;
+}
+.value3 {
+    background-image: url("https://k4hoedown.s3.amazonaws.com/card/common/value-sprite.png");
+    background-position: 0px -80px;
+}
+.value4 {
+    background-image: url("https://k4hoedown.s3.amazonaws.com/card/common/value-sprite.png");
+    background-position: 0px -60px;
+}
+.value5 {
+    background-image: url("https://k4hoedown.s3.amazonaws.com/card/common/value-sprite.png");
+    background-position: 0px -40px;
+}
+.value6 {
+    background-image: url("https://k4hoedown.s3.amazonaws.com/card/common/value-sprite.png");
+    background-position: 0px -20px;
+}
+.value7 {
+    background-image: url("https://k4hoedown.s3.amazonaws.com/card/common/value-sprite.png");
+    background-position: 0px -0px;
+}
+.numbers {
+    width:20px;
+    height:20px; 
+    vertical-align:middle;
+    display: inline-block;
+}
+
+.number1 {
+    background-image: url("https://k4hoedown.s3.amazonaws.com/card/common/number-sprite.png");
+    background-position: 0px 0px;
+}
+
+.number2 {
+    background-image: url("https://k4hoedown.s3.amazonaws.com/card/common/number-sprite.png");
+    background-position: -20px 0px;
+}
+
+.number3 {
+    background-image: url("https://k4hoedown.s3.amazonaws.com/card/common/number-sprite.png");
+    background-position: -40px 0px;
+}
+
+.number4 {
+    background-image: url("https://k4hoedown.s3.amazonaws.com/card/common/number-sprite.png");
+    background-position: -60px 0px;
+}
+
+.number5 {
+    background-image: url("https://k4hoedown.s3.amazonaws.com/card/common/number-sprite.png");
+    background-position: -80px 0px;
+}
+
+.number6 {
+    background-image: url("https://k4hoedown.s3.amazonaws.com/card/common/number-sprite.png");
+    background-position: -100px 0px;
+}
+
+.number7 {
+    background-image: url("https://k4hoedown.s3.amazonaws.com/card/common/number-sprite.png");
+    background-position: -120px 0px;
+}
+.alignCenter {
+    vertical-align: center;
+}
+
+.qrCode {
+    text-align: center;
+}
+
+.kinoma {
+    text-align: center;
+    position: relative;
+    top: -11px;
+}
+-->
+</style>
+</head>
+<body>
+    <div class="clown-header">
+      {% if role_layout.role_name_in_image %}
+      <div class="playerName">{{user.name}}</div>
+      {% else %}
+      <div class="playerName">{{role}} {{user.name}}</div>
+      {% endif %}
+    </div>
+    {% if role_layout.has_top_left_glyph %}
+    <div class="glyph-top-left"></div>
+    {% endif %}
+    <div class="glyph-bottom-right"></div>
+    {% if user.has_photo %}
+    <img class="playerImage dither" src="https://k4hoedown.s3.amazonaws.com/images/{{user.code}}.jpg" alt="" />
+    {% else %}
+    <img class="playerImage dither" src="https://k4hoedown.s3.amazonaws.com/card/player/player-{{user.role}}.jpg" alt="" />
+    {% endif %}
+    <div class="lowerSection"><img src="https://k4hoedown.s3.amazonaws.com/card/divider/divider-top-{{user.role}}.jpg" width="384" height="32" alt="" /><strong>{{role}}:</strong> {{story}}
+        <table class="lowerColumns" width="384" border="0">
+            <tbody><tr>
+                <td class="playerValues" width="180">
+                    <div class="valueLabel">Intelligence:
+                      <div class="numbers number{{user.int}}"> </div>
+                    </div>
+                    <div class="values value{{user.int}}"></div>
+                    
+                
+                    <div class="valueLabel">Wisdom:
+                      <div class="numbers number{{user.wis}}"> </div>
+                    </div>
+                    <div class="values value{{user.wis}}"></div>
+                    
+                    <div class="valueLabel">Strength   :
+                      <div class="numbers number{{user.str}}"> </div>
+                    </div>
+                    <div class="values value{{user.str}}"></div>
+                    
+                    <div class="valueLabel">Constitution      :
+                      <div class="numbers number{{user.con}}"> </div>
+                    </div>
+                    <div class="values value{{user.con}}"></div>
+                    
+                    <div class="valueLabel">Dexterity         :
+                      <div class="numbers number{{user.dex}}"> </div>
+                    </div>
+                    <div class="values value{{user.dex}}"></div>
+                    
+                    <div class="valueLabel">Charisma            :
+                      <div class="numbers number{{user.cha}}"> </div>
+                    </div>
+                    <div class="values value{{user.cha}} last"></div>
+                    
+                    
+                    </td>
+                <td width="10">&nbsp;</td>
+                <td class="instructions" width="194"><div class="instructionsElement"><strong>Instructions</strong></div>
+                    <div class="instructionsElement">1. Scan code below</div>
+                    <div class="instructionsElement">2. Find a Rancher, Rodeo Clown, Outlaw, Sheriff, Oil Baron, Conquistador, and Square Dancer</div>
+                    <div class="instructionsElement">3. Scan their code or have them scan yours</div>
+                    <div class="instructionsElement">4. Complete the challenge</div>
+                    <div class="instructionsElement">5. When you're done, return to stand 135 for a prize!</div>
+                    
+                    <div class="qrCode"><img src="{{qrcode_url}}" alt=""></div>
+                    
+                </td>
+            </tr>
+        </tbody></table>
+        <img src="https://k4hoedown.s3.amazonaws.com/card/divider/divider-bottom-{{user.role}}.jpg" width="384" height="32" alt="" />
+        
+        <div class="kinoma"><img src="https://k4hoedown.s3.amazonaws.com/card/common/kinoma.png" width="152" height="32" alt="" /></div> 
+    </div><!-- /lowerSection -->
+</body>
+</html>
